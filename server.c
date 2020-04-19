@@ -42,12 +42,12 @@ client_t *clients[MAX_CLIENTS];
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //no estoy seguro de esta parte
-
+//segun entiendo, sirve para limpiar la salida de un buffer y mover la data del buffer a la consola
 void str overwrite_stdout(){
     printf("\r%s", " > ");
     fflush(stdout);
 }
-//ni esta parte
+//esta es una funcion para limpiar el \n del mesnaje cuando se manda y cambiarlo por un valor vacio
 void str_trim_lf(char* arr, int length){
     for(int i=0; i<length; i++){
         if(arr[i] == '\n'){
@@ -118,6 +118,8 @@ void *handle_client(void *arg){
     
     //nombre
     //aqui se trata de obtener el nombre del cliente al registrarse y se verifica si esta corretamente hecho
+    //de no estarlo, pues le pide que ingrese uno dentro de los parametros requeridos
+    //si se ingreso un nombre correctamente, pues se ingresa el nombre a la varaible nombre del cliente y muestra mensaje de que se ha unido
     if(recv(cli-> sockfd, name, NAME_LEN, 0) <= 0 || strlen(name) < 2 || strlen(name) >= NAME_LEN -1){
         printf("ingrese un nombre aceptable");
         leave_flag =1;
@@ -127,40 +129,45 @@ void *handle_client(void *arg){
         printf("%s", buffer);
         send_message(buffer, cli -> uid);
     }
-    
+    //vacia el buffer dejando en ceros la data dentro de el
     bzero(buffer< BUFFER_SZ);
     
     while(1){
+        
         if(leave_flag){
             break;
         }
         
+        //aqui se recive el mensaje del cliente si es que se ha logeado con su nombre correctamente.
+        //se recive el mensaje del cliente al socket asociado. se manda el mensaje a almacenar en el buffer
         
         int receive = recv(cli -> sockfd, buffer, BUFFER_SZ, 0);
-        
+        //se revisa que no sea cero para ver que no este vacio ni receive, ni el buffer.
         if(receive > 0){
             if(strlen(buffer) > 0){
+                //se manda el buffer y el uid del cliente que envio el mensaje.
                 send_message(buffer, cli->uid);
+                //se extrae el mensaje del buffer y se muestra con el nombre del cliente
                 str_trim_lf(buffer, strlen(buffer));
                 printf("%s -> %s", buffer, cli-> name)
             }
-        }else if(receive == 0 || strcmp(buffer, "exit")==0){
-            sprintf(buffer, "%s has left\n", cli -> name);
-            printf("%s" , buffer);
-            send_message(buffer, cli -> uid);
+        }else if(receive == 0 || strcmp(buffer, "exit")==0){ //esta parte es para deja la sala de chat
+            sprintf(buffer, "%s has left\n", cli -> name); //se muestra el mensaje de que tal usario dejo el chat
+            printf("%s" , buffer); //muestra mensaje del buffer
+            send_message(buffer, cli -> uid);//manda el mensaje al chat general para todos
             leave_flag = 1;
         }else{
-            printf("ERROR: -1\n");
+            printf("ERROR: -1\n");//condicion en caso de que hubiese error
             leave_flag =1;
         }
-        
+        //vacia el buffer
         bzero(buffer, BUFFER_SZ);
     }
-    close(cli -> sockfd);
-    queue_remove(cli -> uid);
-    free(cli);
-    cli_count--;
-    pthread_detach(pthread_self());
+    close(cli -> sockfd);//se cierra el socket, por el cual el cliente se esta comunicando
+    queue_remove(cli -> uid);//se manda el uid para remover al user que se desconecto
+    free(cli); //se limpia la variable que esta usando el cliente con su info
+    cli_count--; //se baja el indicador de la cantidad de clientes
+    pthread_detach(pthread_self());//no se aun que es esto.
     
     return NULL;
 }
