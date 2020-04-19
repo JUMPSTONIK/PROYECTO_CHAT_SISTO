@@ -40,7 +40,7 @@ void catch_ctrl_c_and_exit(){
 	flag = 1;
 } 
 
-void recv_msg_thread(){
+void recv_msg_handler(){
 	char message[BUFFER_SZ] = {};
 	while(1){
 		int receive = recv(sockfd, message, BUFFER_SZ, 0);
@@ -60,7 +60,7 @@ void send_msg_handler(){
 
 	while(1){
 		str_overwrite_stdout();
-		fgets(buffer, BUFFER_SZ, stdin)
+		fgets(buffer, BUFFER_SZ, stdin);
 		str_trim_lf(buffer, BUFFER_SZ);
 
 		if (strcmp(buffer, "exit") == 0)
