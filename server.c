@@ -50,7 +50,8 @@ void str_overwrite_stdout(){
 }
 //esta es una funcion para limpiar el \n del mesnaje cuando se manda y cambiarlo por un valor vacio
 void str_trim_lf(char* arr, int length){
-    for(int i=0; i<length; i++){
+    int i = 0;
+    for(i=0; i<length; i++){
         if(arr[i] == '\n'){
             arr[i] = '\0';
             break;
@@ -62,7 +63,8 @@ void str_trim_lf(char* arr, int length){
 void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
     //se revisa que el cliente no existe dentro del queue de clientes para que no se repita
-    for(int i= 0; i<MAX_CLIENTS; i++){
+    int i= 0;
+    for(i= 0; i<MAX_CLIENTS; i++){
         if(!clients[i]){
             clients[i] = cl;
             break;
@@ -76,7 +78,8 @@ void queue_add(client_t *cl){
 void queue_remove(int uid){
     pthread_mutex_lock(&clients_mutex);
     //se busca a dicho cliente por su uid y se remueve del queue
-    for(int i = 0; i< MAX_CLIENTS; i++){
+    int i= 0;
+    for(i = 0; i< MAX_CLIENTS; i++){
         if(clients[i]){
             if(clients[i] -> uid == uid){
                 clients[i] = NULL;
@@ -92,7 +95,8 @@ void queue_remove(int uid){
 void send_message(char *s, int uid){
     pthread_mutex_lock(&clients_mutex);
     //se verifica si existien clientes para luego revisar si existe el que tiene dicho iud
-    for(int i = 0; i< MAX_CLIENTS; i++){
+    int i= 0;
+    for(i = 0; i< MAX_CLIENTS; i++){
         if(clients[i]){
             if(clients[i] -> uid == uid){
                 //se verifica que no sea un mensaje vacio el cual se manda por el socket

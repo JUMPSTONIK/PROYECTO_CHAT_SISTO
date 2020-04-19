@@ -26,7 +26,8 @@ void str_overwrite_stdout(){
 }
 //esta es una funcion para limpiar el \n del mesnaje cuando se manda y cambiarlo por un valor vacio
 void str_trim_lf(char* arr, int length){
-    for(int i=0; i<length; i++){
+    int i= 0;
+    for(i=0; i<length; i++){
         if(arr[i] == '\n'){
             arr[i] = '\0';
             break;
