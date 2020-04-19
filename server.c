@@ -25,8 +25,8 @@ typedef struct{
     struct sockaddr_in address;
     int sockfd;
     int uid;
-    char name[NAME_LEN];
-}
+    char name[32];
+} client_t;
 
 //funcion para imprimir tu direccion del cliente
 void print_ip_addr(struct sockaddr_in addr){
@@ -35,7 +35,7 @@ void print_ip_addr(struct sockaddr_in addr){
             (addr.sin_addr.s_addr & 0xff00) >> 8,
             (addr.sin_addr.s_addr & 0xff0000) >> 16,
             (addr.sin_addr.s_addr & 0xff000000) >> 24);
-} client_t;
+}
 
 //se inicializa queue de los clientes en el chat conectados
 client_t *clients[MAX_CLIENTS];
@@ -58,19 +58,20 @@ void str_trim_lf(char* arr, int length){
         }
     }
 }
+
 //funcion para agregar clientes al queue
 //se debe de enviar como parametro el cliente nuevo con su info como esta en la estructura
 void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
     //se revisa que el cliente no existe dentro del queue de clientes para que no se repita
     int i= 0;
-    for(i= 0; i<MAX_CLIENTS; i++){
+    for(i=0; i < MAX_CLIENTS; ++i){
         if(!clients[i]){
             clients[i] = cl;
             break;
         }
     }
-    
+
     pthread_mutex_unlock(&clients_mutex);
 }
 
@@ -135,7 +136,7 @@ void *handle_client(void *arg){
         send_message(buffer, cli -> uid);
     }
     //vacia el buffer dejando en ceros la data dentro de el
-    bzero(buffer< BUFFER_SZ);
+    bzero(buffer, BUFFER_SZ);
     
     while(1){
         
@@ -230,7 +231,7 @@ int main(int argc, char **argv)
 
         socklen_t clilen = sizeof(cli_addr);
         //aqui basicamente creamso la aceptacion al socket que se ha conectado y que hemos configurado.
-        connfd = accept(listenfd, (struct sockaddr*)&cli_addr, clilen);
+        connfd = accept(listenfd, (struct sockaddr*)&cli_addr, &clilen);
         
         //comprobar el maximo de clientes conectados
         //solo es para comprobar que no hay mas clientes de los que el server puede soportar. automaticamente saca quien sobrepasa el limite
