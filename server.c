@@ -2,6 +2,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
@@ -43,7 +44,7 @@ pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //no estoy seguro de esta parte
 //segun entiendo, sirve para limpiar la salida de un buffer y mover la data del buffer a la consola
-void str overwrite_stdout(){
+void str_overwrite_stdout(){
     printf("\r%s", " > ");
     fflush(stdout);
 }
@@ -149,7 +150,7 @@ void *handle_client(void *arg){
                 send_message(buffer, cli->uid);
                 //se extrae el mensaje del buffer y se muestra con el nombre del cliente
                 str_trim_lf(buffer, strlen(buffer));
-                printf("%s -> %s", buffer, cli-> name)
+                printf("%s\n", buffer);
             }
         }else if(receive == 0 || strcmp(buffer, "exit")==0){ //esta parte es para deja la sala de chat
             sprintf(buffer, "%s has left\n", cli -> name); //se muestra el mensaje de que tal usario dejo el chat
