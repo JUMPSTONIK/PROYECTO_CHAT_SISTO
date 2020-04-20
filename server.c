@@ -131,7 +131,7 @@ void *handle_client(void *arg){
         leave_flag =1;
     }else{
         strcpy(cli -> name, name);
-        printf(buffer, "%s has joined\n", cli -> name);
+        sprintf(buffer, "%s has joined\n", cli -> name);
         printf("%s", buffer);
         send_message(buffer, cli -> uid);
     }
