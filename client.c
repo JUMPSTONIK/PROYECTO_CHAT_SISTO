@@ -38,6 +38,18 @@ void str_trim_lf(char* arr, int length){
 
 void catch_ctrl_c_and_exit(){
 	flag = 1;
+}
+
+void help(){
+	printf("A continuacion esta la lista de todos los comandos, para que funcionan y como usarlos\n
+		~exit - use este comando para salir del chat o presione CTRL left + C \n
+		~1 - use este comando para cambiar su estatus a ACTIVO\n
+		~2 - use este comando para cambiar su estatus a OCUPADO\n
+		~3 - use este comando para cambiar su estatus a INACTIVO\n
+		~help - use este comando para deplegar esta ventana de nuevo\n
+		~info [nombre del cliente] - ingrese este comando al lado del nombre de un cliente activo para despegar su informacion\n
+
+		");
 } 
 
 void recv_msg_handler(){
@@ -63,10 +75,10 @@ void send_msg_handler(){
 		fgets(buffer, BUFFER_SZ, stdin);
 		str_trim_lf(buffer, BUFFER_SZ);
 
-		if (strcmp(buffer, "exit") == 0)
+		if (strcmp(buffer, "~exit") == 0)
 		{
 			break;
-		}else if(strcmp(buffer, "~1")==0 || strcmp(buffer, "~2")==0 || strcmp(buffer, "~3")==0){
+		}else if(strcmp(buffer, "~1")==0 || strcmp(buffer, "~2")==0 || strcmp(buffer, "~3")==0 || strcmp(buffer, "~help")==0){
 			if (strcmp(buffer, "~1") == 0){
     			printf("%s\n", "Status: ACTIVO");
     			send(sockfd, buffer, strlen(buffer), 0);
@@ -78,6 +90,9 @@ void send_msg_handler(){
 		    else if (strcmp(buffer, "~3") == 0){
 		    	printf("%s\n", "Status: INACTIVO");
     			send(sockfd, buffer, strlen(buffer), 0);
+		        }
+		    else if (strcmp(buffer, "~help") == 0){
+		    	help();
 		        }
 		    else {
 		        printf("No valido :(");
@@ -145,7 +160,8 @@ int main(int argc, char **argv){
     //Enviar el nombre
     send(sockfd, argv[1], NAME_LEN,0);
 
-    printf("///WELCOME TO THE CHAT///\n");
+    printf("///WELCOME TO THE CHAT///\n
+    		para saber todos los comando del chat ponga el comando ~help y presione ENTER\n");
 
     pthread_t send_msg_thread;
     if(pthread_create(&send_msg_thread, NULL, (void*)send_msg_handler, NULL) != 0){
