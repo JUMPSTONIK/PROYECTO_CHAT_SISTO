@@ -148,8 +148,20 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
-void connected_clients(){
+void connected_clients(client_t *cl){
+	char nombreKK[100];
+	pthread_mutex_lock(&clients_mutex);
 
+	int i = 0;
+
+    for(i=0; i < MAX_CLIENTS; ++i){
+        if(clients[i] -> status == "ACTIVO"){
+        	sprintf(nombreKK, "%s esta conectado \n", clients[i] -> name);
+            //printf("%s\n", nombreKK);			
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
 }
 
 void *handle_client(void *arg){
@@ -194,7 +206,7 @@ void *handle_client(void *arg){
                 strcmp(buffer, "~2")==0 || 
                 strcmp(buffer, "~3")==0){
                     //status_change(cli, buffer);
-            		connected_clients();
+            		connected_clients(cli);
             } else if (strcmp(buffer, "~clients")==0 ) {
             	printf("sdada \n");
             }
