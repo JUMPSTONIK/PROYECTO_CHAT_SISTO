@@ -72,11 +72,13 @@ void *send_msg_handler(void *){
 		if (strcmp(buffer, "~exit") == 0)
 		{
 			break;
-		}else if(strcmp(buffer, "~1")==0 || 
+		}else if(
+			strcmp(buffer, "~1")==0 || 
 			strcmp(buffer, "~2")==0 || 
 			strcmp(buffer, "~3")==0 || 
 			strcmp(buffer, "~help")==0 ||
 			strcmp(buffer, "~clients")==0||
+			strcmp(buffer, "~exit")==0||
 			(buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' )){
 			if (strcmp(buffer, "~1") == 0){
     			printf("%s\n", "Status: ACTIVO");
@@ -169,13 +171,13 @@ int main(int argc, char **argv){
     printf("///WELCOME TO THE CHAT///\nPara saber todos los comando del chat ponga el comando ~help y presione ENTER\n");
 
     pthread_t send_msg_thread;
-    if(pthread_create(&send_msg_thread, NULL, (void*)send_msg_handler, NULL) != 0){
+    if(pthread_create(&send_msg_thread, NULL, send_msg_handler, NULL) != 0){
     	printf("ERROR: pthread\n");
     	return EXIT_FAILURE;
     }
 
     pthread_t recv_msg_thread;
-    if(pthread_create(&recv_msg_thread, NULL, (void*)recv_msg_handler, NULL) != 0){
+    if(pthread_create(&recv_msg_thread, NULL, recv_msg_handler, NULL) != 0){
     	printf("ERROR: pthread\n");
     	return EXIT_FAILURE;
     }
