@@ -55,8 +55,8 @@ void recv_msg_handler(){
 }
 
 void send_msg_handler(){
-	char buffer[BUFFER_SZ] = {};
-	char message[BUFFER_SZ + NAME_LEN] = {};
+	char message[BUFFER_SZ] = {};
+	char buffer[BUFFER_SZ + NAME_LEN] = {};
 
 	while(1){
 		str_overwrite_stdout();
@@ -71,8 +71,8 @@ void send_msg_handler(){
 			send(sockfd, message, strlen(message), 0);
 		}
 
-	bzero(buffer, BUFFER_SZ);
-	bzero(message, BUFFER_SZ + NAME_LEN);
+	bzero(message, BUFFER_SZ);
+	bzero(buffer, BUFFER_SZ + NAME_LEN);
 	}
 	catch_ctrl_c_and_exit(2);
 }
