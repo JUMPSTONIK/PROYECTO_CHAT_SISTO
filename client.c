@@ -74,7 +74,8 @@ void send_msg_handler(){
 			strcmp(buffer, "~2")==0 || 
 			strcmp(buffer, "~3")==0 || 
 			strcmp(buffer, "~help")==0 ||
-			strcmp(buffer, "~clients")==0){
+			strcmp(buffer, "~clients")==0||
+			(buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' )){
 			if (strcmp(buffer, "~1") == 0){
     			printf("%s\n", "Status: ACTIVO");
     			send(sockfd, buffer, strlen(buffer), 0);
@@ -94,6 +95,7 @@ void send_msg_handler(){
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
 		    else if (buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' ){
+				printf("comprobando si entra\n");
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
 		    else {

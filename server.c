@@ -105,7 +105,7 @@ void client_info(client_t *cl, char *msg){
             }
         }
     }
-    if (strcmp(buff, '\0') == 0);
+    if (strcmp(buff, "") == 0);
     {
         sprintf(buff, "no se encontro informacion de quien ha solicitado. puede el usuario no este conectado. Asegurese de ver la lista y si escribio el nombre correcto.");
         printf("%s\n", buff);
