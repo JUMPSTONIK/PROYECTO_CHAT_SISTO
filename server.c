@@ -83,7 +83,7 @@ void client_info(client_t *cl, char *msg){
     int i = 0;
     for (i = 6; i < strlen(msg); ++i)
     {
-        if (msg[i] != "#")
+        if (msg[i] != '#')
         {
             nam[i-6] = msg[i];
         }else{
@@ -105,7 +105,7 @@ void client_info(client_t *cl, char *msg){
             }
         }
     }
-    if (buff = "")
+    if (buff = "");
     {
         sprintf(buff, "no se encontro informacion de quien ha solicitado. puede el usuario no este conectado. Asegurese de ver la lista y si escribio el nombre correcto.")
         printf("%s\n", buff);
