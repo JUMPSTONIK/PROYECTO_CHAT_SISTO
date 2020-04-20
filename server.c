@@ -46,7 +46,7 @@ pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 // set status del cliente
 void status_change(client_t *cl, char *status){
     pthread_mutex_lock(&clients_mutex);
-    char nombreKK[100];
+    //char nombreKK[100];
     char *msg;
     //ACTIVO, OCUPADO e INACTIVO
     //recorre todos los cleintes en que se busca
@@ -75,6 +75,7 @@ void status_change(client_t *cl, char *status){
     }
     pthread_mutex_unlock(&clients_mutex);
 }
+
 
 
 //no estoy seguro de esta parte
@@ -147,6 +148,10 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+void connected_clients(){
+
+}
+
 void *handle_client(void *arg){
     //se inicializan variables como el buffer para mensaje, el nombre, señal de salida y cantidad de clientes
     char buffer[BUFFER_SZ];
@@ -188,7 +193,10 @@ void *handle_client(void *arg){
             if(strcmp(buffer, "~1")==0 || 
                 strcmp(buffer, "~2")==0 || 
                 strcmp(buffer, "~3")==0){
-                    status_change(cli, buffer);
+                    //status_change(cli, buffer);
+            		connected_clients();
+            } else if (strcmp(buffer, "~clients")==0 ) {
+            	printf("sdada \n");
             }
             else{
                 //se manda el buffer y el uid del cliente que envio el mensaje.
