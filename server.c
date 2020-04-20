@@ -105,14 +105,6 @@ void client_info(client_t *cl, char *msg){
             }
         }
     }
-    if (buff[0] = 'e')
-    {
-        sprintf(buff, "no se encontro informacion de quien ha solicitado. puede el usuario no este conectado. Asegurese de ver la lista y si escribio el nombre correcto.");
-        printf("%s\n", buff);
-        if(write(cl -> sockfd, buff, strlen(buff)) < 0){
-            printf("ERROR: escrito al descriptor fallo\n");
-        }
-    }
     pthread_mutex_unlock(&clients_mutex);
 }
 

@@ -95,7 +95,7 @@ void send_msg_handler(){
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
 		    else if (buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' ){
-				printf("comprobando si entra\n");
+				printf("En caso no aparezca informacion despues este mensaje, puede ser a que no escribio bien el comando o el nombre de la persona.\n");
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
 		    else {
