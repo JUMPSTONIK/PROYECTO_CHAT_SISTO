@@ -105,9 +105,9 @@ void client_info(client_t *cl, char *msg){
             }
         }
     }
-    if (buff = "");
+    if (buff = '\0');
     {
-        sprintf(buff, "no se encontro informacion de quien ha solicitado. puede el usuario no este conectado. Asegurese de ver la lista y si escribio el nombre correcto.")
+        sprintf(buff, "no se encontro informacion de quien ha solicitado. puede el usuario no este conectado. Asegurese de ver la lista y si escribio el nombre correcto.");
         printf("%s\n", buff);
         if(write(cl -> sockfd, buff, strlen(buff)) < 0){
             printf("ERROR: escrito al descriptor fallo\n");
@@ -248,7 +248,7 @@ void *handle_client(void *arg){
                     status_change(cli, buffer);
             }else if (strcmp(buffer, "~clients")==0){
 				connected_clients(cli);
-            }else if (buffer[0] == "~" && buffer[1] == "i" && buffer[2] == "n" && buffer[3] == "f" && buffer[4] == "o" ){
+            }else if (buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' ){
                 client_info(cli, buffer);
             }
             else{

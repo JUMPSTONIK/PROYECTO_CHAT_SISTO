@@ -93,7 +93,7 @@ void send_msg_handler(){
 		    else if (strcmp(buffer, "~clients") == 0){
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
-		    else if (buffer[0] == "~" && buffer[1] == "i" && buffer[2] == "n" && buffer[3] == "f" && buffer[4] == "o" ){
+		    else if (buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' ){
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
 		    else {
