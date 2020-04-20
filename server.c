@@ -45,17 +45,18 @@ pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // set status del cliente
 void status_change(client_t *cl, char *status){
+    pthread_mutex_lock(&clients_mutex);
+    char nombreKK[100];
     char *msg;
     //ACTIVO, OCUPADO e INACTIVO
-    pthread_mutex_lock(&clients_mutex);
     //recorre todos los cleintes en que se busca
-    if (strcmp(status, "1") == 0){
+    if (strcmp(status, "~1") == 0){
         msg = "ACTIVO";
     }
-    else if (strcmp(status, "2") == 0){
+    else if (strcmp(status, "~2") == 0){
         msg = "OCUPADO";
         }
-    else if (strcmp(status, "3") == 0){
+    else if (strcmp(status, "~3") == 0){
         msg = "INACTIVO";
         }
     else {
@@ -67,9 +68,12 @@ void status_change(client_t *cl, char *status){
     for(i=0; i < MAX_CLIENTS; ++i){
         if(clients[i] == cl){
             strcpy(clients[i] -> status, msg);
+            //sprintf(nombreKK, "esta ahora: %s \n", clients[i] -> status);
+            //printf("%s\n", nombreKK);
             break;
         }
     }
+    pthread_mutex_unlock(&clients_mutex);
 }
 
 
@@ -181,24 +185,24 @@ void *handle_client(void *arg){
         int receive = recv(cli -> sockfd, buffer, BUFFER_SZ, 0);
         //se revisa que no sea cero para ver que no este vacio ni receive, ni el buffer.
         if(receive > 0){
-            if(strlen(buffer) > 0){
+            if(strcmp(buffer, "~1")==0 || 
+                strcmp(buffer, "~2")==0 || 
+                strcmp(buffer, "~3")==0){
+                    status_change(cli, buffer);
+            }
+            else{
                 //se manda el buffer y el uid del cliente que envio el mensaje.
                 send_message(buffer, cli->uid);
                 //se extrae el mensaje del buffer y se muestra con el nombre del cliente
                 str_trim_lf(buffer, strlen(buffer));
                 printf("%s\n", buffer);
             }
+
         }else if(receive == 0 || strcmp(buffer, "exit")==0){ //esta parte es para deja la sala de chat
             sprintf(buffer, "%s has left\n", cli -> name); //se muestra el mensaje de que tal usario dejo el chat
             printf("%s" , buffer); //muestra mensaje del buffer
             send_message(buffer, cli -> uid);//manda el mensaje al chat general para todos
             leave_flag = 1;
-        }else if(receive == 0 || strcmp(buffer, "status")==0){
-            printf("Ingrese el numero correspondiente al status");
-            printf("1 ACTIVO");
-            printf("2 OCUPADO");
-            printf("3 INACTIVO");
-            status_change();
         }else{
             printf("ERROR: -1\n");//condicion en caso de que hubiese error
             leave_flag =1;
@@ -287,6 +291,7 @@ int main(int argc, char **argv)
         cli -> address = cli_addr;
         cli -> sockfd = connfd;
         cli -> uid = uid++;
+        strcpy(cli -> name, "ACTIVO");
         
         //agregar cliente al queue
         queue_add(cli);

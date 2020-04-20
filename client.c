@@ -66,7 +66,24 @@ void send_msg_handler(){
 		if (strcmp(buffer, "exit") == 0)
 		{
 			break;
-		}else {
+		}else if(strcmp(buffer, "~1")==0 || strcmp(buffer, "~2")==0 || strcmp(buffer, "~3")==0){
+			if (strcmp(buffer, "~1") == 0){
+    			printf("%s\n", "Status: ACTIVO");
+    			send(sockfd, buffer, strlen(buffer), 0);
+			}
+		    else if (strcmp(buffer, "~2") == 0){
+		    	printf("%s\n", "Status: OCUPADO");
+    			send(sockfd, buffer, strlen(buffer), 0);
+		        }
+		    else if (strcmp(buffer, "~3") == 0){
+		    	printf("%s\n", "Status: INACTIVO");
+    			send(sockfd, buffer, strlen(buffer), 0);
+		        }
+		    else {
+		        printf("No valido :(");
+		    }
+
+		}else{
 			sprintf(message, "%s: %s\n", name, buffer);
 			send(sockfd, message, strlen(message), 0);
 		}
