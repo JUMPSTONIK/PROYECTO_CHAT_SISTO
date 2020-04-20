@@ -80,7 +80,7 @@ void client_info(client_t *cl, char *msg){
     pthread_mutex_lock(&clients_mutex);
     char buff[BUFFER_SZ];
     char nam[NAME_LEN];
-    int i = 0
+    int i = 0;
     for (i = 6; i < strlen(msg); ++i)
     {
         if (msg[i] != "#")
