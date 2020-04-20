@@ -21,7 +21,7 @@ static int uid = 10;
 //Estructura de los clientes
 typedef struct{
     //se debe agregar la variable de estatus para el cliente
-    //char status
+    char status[10];
     struct sockaddr_in address;
     int sockfd;
     int uid;
@@ -41,6 +41,37 @@ void print_ip_addr(struct sockaddr_in addr){
 client_t *clients[MAX_CLIENTS];
 //se inicializa el mutex para coordinar los mensajes
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+
+// set status del cliente
+void status_change(client_t *cl, char *status){
+    char *msg;
+    //ACTIVO, OCUPADO e INACTIVO
+    pthread_mutex_lock(&clients_mutex);
+    //recorre todos los cleintes en que se busca
+    if (strcmp(status, "1") == 0){
+        msg = "ACTIVO";
+    }
+    else if (strcmp(status, "2") == 0){
+        msg = "OCUPADO";
+        }
+    else if (strcmp(status, "3") == 0){
+        msg = "INACTIVO";
+        }
+    else {
+        printf("No valido :(");
+        return;
+    }
+
+    int i= 0;
+    for(i=0; i < MAX_CLIENTS; ++i){
+        if(clients[i] == cl){
+            strcpy(clients[i] -> status, msg);
+            break;
+        }
+    }
+}
+
 
 //no estoy seguro de esta parte
 //segun entiendo, sirve para limpiar la salida de un buffer y mover la data del buffer a la consola
@@ -162,6 +193,12 @@ void *handle_client(void *arg){
             printf("%s" , buffer); //muestra mensaje del buffer
             send_message(buffer, cli -> uid);//manda el mensaje al chat general para todos
             leave_flag = 1;
+        }else if(receive == 0 || strcmp(buffer, "status")==0){
+            printf("Ingrese el numero correspondiente al status");
+            printf("1 ACTIVO");
+            printf("2 OCUPADO");
+            printf("3 INACTIVO");
+            status_change();
         }else{
             printf("ERROR: -1\n");//condicion en caso de que hubiese error
             leave_flag =1;
