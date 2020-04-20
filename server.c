@@ -21,7 +21,7 @@ static int uid = 10;
 //Estructura de los clientes
 typedef struct{
     //se debe agregar la variable de estatus para el cliente
-    char status[10] = "ACTIVO";
+    char status[10];
     struct sockaddr_in address;
     int sockfd;
     int uid;
@@ -294,6 +294,7 @@ int main(int argc, char **argv)
     //otras variables que necesitamos, pero no estoy seguro para que sirven
     int option = 1;
     int listenfd = 0, connfd = 0;
+    char stat[8] = "ACTIVO";
     struct sockaddr_in serv_addr;
     struct sockaddr_in cli_addr;
     //varaible para crear los treads
@@ -352,6 +353,7 @@ int main(int argc, char **argv)
         cli -> address = cli_addr;
         cli -> sockfd = connfd;
         cli -> uid = uid++;
+        strcpy(cli -> status, stat);
         //strcpy(cli -> name, "ACTIVO");
         
         //agregar cliente al queue
