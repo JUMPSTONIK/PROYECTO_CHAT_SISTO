@@ -149,19 +149,21 @@ void send_message(char *s, int uid){
 }
 
 void connected_clients(client_t *cl){
-	char nombreKK[100];
-	pthread_mutex_lock(&clients_mutex);
-
+	char userName[200];
 	int i = 0;
 
     for(i=0; i < MAX_CLIENTS; ++i){
-        if(clients[i] -> status == "ACTIVO"){
-        	sprintf(nombreKK, "%s esta conectado \n", clients[i] -> name);
-            //printf("%s\n", nombreKK);			
-        }
+    	if(clients[i]){
+	    	sprintf(userName, "%s esta conectado, \n", clients[i] -> name);
+	        printf("%s", userName);
+         	if(write(cl -> sockfd, userName, strlen(userName)) < 0){
+                printf("ERROR: escrito al descriptor fallo\n");
+                break;
+            }
+	    	//resest name and frees memeory
+	        //bzero(userName, 100);	
+    	}
     }
-
-    pthread_mutex_unlock(&clients_mutex);
 }
 
 void *handle_client(void *arg){
@@ -205,10 +207,9 @@ void *handle_client(void *arg){
             if(strcmp(buffer, "~1")==0 || 
                 strcmp(buffer, "~2")==0 || 
                 strcmp(buffer, "~3")==0){
-                    //status_change(cli, buffer);
-            		connected_clients(cli);
-            } else if (strcmp(buffer, "~clients")==0 ) {
-            	printf("sdada \n");
+                    status_change(cli, buffer);
+            }else if (strcmp(buffer, "~clients")==0){
+				connected_clients(cli);
             }
             else{
                 //se manda el buffer y el uid del cliente que envio el mensaje.

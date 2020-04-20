@@ -70,7 +70,11 @@ void send_msg_handler(){
 		if (strcmp(buffer, "~exit") == 0)
 		{
 			break;
-		}else if(strcmp(buffer, "~1")==0 || strcmp(buffer, "~2")==0 || strcmp(buffer, "~3")==0 || strcmp(buffer, "~help")==0){
+		}else if(strcmp(buffer, "~1")==0 || 
+			strcmp(buffer, "~2")==0 || 
+			strcmp(buffer, "~3")==0 || 
+			strcmp(buffer, "~help")==0 ||
+			strcmp(buffer, "~clients")==0){
 			if (strcmp(buffer, "~1") == 0){
     			printf("%s\n", "Status: ACTIVO");
     			send(sockfd, buffer, strlen(buffer), 0);
@@ -86,6 +90,9 @@ void send_msg_handler(){
 		    else if (strcmp(buffer, "~help") == 0){
 		    	help();
 		        }
+		    else if (strcmp(buffer, "~clients") == 0){
+				send(sockfd, buffer, strlen(buffer), 0);
+		    	}
 		    else {
 		        printf("No valido :(");
 		    }
