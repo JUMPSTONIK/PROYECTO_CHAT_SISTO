@@ -41,7 +41,7 @@ void catch_ctrl_c_and_exit(){
 }
 
 void help(){
-	printf("A continuacion esta la lista de todos los comandos, para que funcionan y como usarlos\n~exit - use este comando para salir del chat o presione CTRL left + C \n~1 - use este comando para cambiar su estatus a ACTIVO\n~2 - use este comando para cambiar su estatus a OCUPADO\n~3 - use este comando para cambiar su estatus a INACTIVO\n~help - use este comando para deplegar esta ventana de nuevo\n~info [nombre del cliente] - ingrese este comando al lado del nombre de un cliente activo para despegar su informacion\n");
+	printf("A continuacion esta la lista de todos los comandos, para que funcionan y como usarlos\n~exit - use este comando para salir del chat o presione CTRL left + C \n~1 - use este comando para cambiar su estatus a ACTIVO\n~2 - use este comando para cambiar su estatus a OCUPADO\n~3 - use este comando para cambiar su estatus a INACTIVO\n~help - use este comando para desplegar esta ventana de nuevo\n~clients - use este comando para desplegar la lista de todos los clientes conectados al chat\n~info#[nombre del cliente]# - ingrese este comando al lado del nombre de un cliente activo para despegar su informacion. ejemplo: ~info#john#\n");
 } 
 
 void recv_msg_handler(){
@@ -91,6 +91,9 @@ void send_msg_handler(){
 		    	help();
 		        }
 		    else if (strcmp(buffer, "~clients") == 0){
+				send(sockfd, buffer, strlen(buffer), 0);
+		    	}
+		    else if (buffer[0] == "~" && buffer[1] == "i" && buffer[2] == "n" && buffer[3] == "f" && buffer[4] == "o" ){
 				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
 		    else {

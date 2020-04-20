@@ -76,7 +76,45 @@ void status_change(client_t *cl, char *status){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+void client_info(client_t *cl, char *msg){
+    pthread_mutex_lock(&clients_mutex);
+    char buff[BUFFER_SZ];
+    char nam[NAME_LEN];
+    int i = 0
+    for (i = 6; i < strlen(msg); ++i)
+    {
+        if (msg[i] != "#")
+        {
+            nam[i-6] = msg[i];
+        }else{
+            break;
+        }
+        
+    }
 
+    for(i=0; i < MAX_CLIENTS; ++i){
+        if(clients[i]){
+            if (strcmp(clients[i] -> name, nam)==0)
+            {
+                sprintf(buff, "el nombre de quien ha solicitado informacion es:\nnombre: %s\nstatus: %s\nuid: %d\nsocket: %d\n", clients[i] -> name,clients[i] -> status,clients[i] -> uid,clients[i] -> sockfd);
+                printf("%s\n", buff);
+                if(write(cl -> sockfd, buff, strlen(buff)) < 0){
+                printf("ERROR: escrito al descriptor fallo\n");
+                break;
+            }
+            }
+        }
+    }
+    if (buff = "")
+    {
+        sprintf(buff, "no se encontro informacion de quien ha solicitado. puede el usuario no este conectado. Asegurese de ver la lista y si escribio el nombre correcto.")
+        printf("%s\n", buff);
+        if(write(cl -> sockfd, buff, strlen(buff)) < 0){
+            printf("ERROR: escrito al descriptor fallo\n");
+        }
+    }
+    pthread_mutex_unlock(&clients_mutex);
+}
 
 //no estoy seguro de esta parte
 //segun entiendo, sirve para limpiar la salida de un buffer y mover la data del buffer a la consola
@@ -210,6 +248,8 @@ void *handle_client(void *arg){
                     status_change(cli, buffer);
             }else if (strcmp(buffer, "~clients")==0){
 				connected_clients(cli);
+            }else if (buffer[0] == "~" && buffer[1] == "i" && buffer[2] == "n" && buffer[3] == "f" && buffer[4] == "o" ){
+                client_info(cli, buffer);
             }
             else{
                 //se manda el buffer y el uid del cliente que envio el mensaje.
