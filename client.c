@@ -78,16 +78,30 @@ void send_msg_handler(){
 }
 
 int main(int argc, char **argv){
-	if(argc != 2){
-		printf("Usage: %s <port>\n", argv[0]);
+
+	if(argc != 4){
+        printf("Debe ingresar de las siguiente manera los parametros correspondientes al correr el programa\n");
+        printf("<nombredelcliente> <nombredeusuario> <IPdelservidor> <puertodelservidor>\n");
+        printf("por ejemplo: ./client jose 127.0.0.1 4444\n");
+        //printf("Usage: %s <port>\n", argv[0]);
+        return EXIT_FAILURE;
+    }
+
+	strcpy(name, argv[1]);
+	char *ip = argv[2];
+    	int port = atoi(argv[3]);
+
+	signal(SIGINT, catch_ctrl_c_and_exit);
+	
+	printf("%s\n",argv[1]);
+	str_trim_lf(argv[1], strlen(argv[1]));
+
+	if(strlen(argv[1]) > NAME_LEN - 1 ||  strlen(argv[1]) < 2){
+		printf("Ingrese un nombre correctamente\n");
 		return EXIT_FAILURE;
 	}
 
-	char *ip = "127.0.0.1";
-	int port = atoi(argv[1]);
-
-	signal(SIGINT, catch_ctrl_c_and_exit);
-
+/*
 	printf("Ingrese un nombre: ");
 	fgets(name, NAME_LEN, stdin);
 	str_trim_lf(name, strlen(name));
@@ -96,7 +110,7 @@ int main(int argc, char **argv){
 		printf("Ingrese un nombre correctamente\n");
 		return EXIT_FAILURE;
 	}
-
+*/
 	struct sockaddr_in server_addr;
 	//configuracion de los sockets
     sockfd = socket(AF_INET, SOCK_STREAM,0);
@@ -112,7 +126,7 @@ int main(int argc, char **argv){
     }
 
     //Enviar el nombre
-    send(sockfd, name, NAME_LEN,0);
+    send(sockfd, argv[1], NAME_LEN,0);
 
     printf("///WELCOME TO THE CHAT///\n");
 
