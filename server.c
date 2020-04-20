@@ -99,7 +99,7 @@ void send_message(char *s, int uid){
     int i= 0;
     for(i = 0; i< MAX_CLIENTS; i++){
         if(clients[i]){
-            if(clients[i] -> uid == uid){
+            if(clients[i] -> uid != uid){
                 //se verifica que no sea un mensaje vacio el cual se manda por el socket
                 if(write(clients[i] -> sockfd, s, strlen(s)) < 0){
                     printf("ERROR: escrito al descriptor fallo\n");
