@@ -1,5 +1,5 @@
 compile:
-	g++ server.cpp -o server -pthread
-	g++ client.cpp -o client -pthread
+	g++ server.cpp mensaje.pb.cc -o server -pthread -lprotobuf
+	g++ client.cpp mensaje.pb.cc -o client -pthread -lprotobuf
 
 

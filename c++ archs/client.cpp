@@ -12,6 +12,10 @@ using namespace std;
 #include <sys/types.h>
 #include <signal.h>
 
+//protocol
+#include "mensaje.pb.h"
+using namespace chat;
+
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
 #define NAME_LEN 32
@@ -43,7 +47,7 @@ void catch_ctrl_c_and_exit(int var){
 }
 
 void help(){
-	printf("A continuacion esta la lista de todos los comandos, para que funcionan y como usarlos\n~exit - use este comando para salir del chat o presione CTRL left + C \n~1 - use este comando para cambiar su estatus a ACTIVO\n~2 - use este comando para cambiar su estatus a OCUPADO\n~3 - use este comando para cambiar su estatus a INACTIVO\n~help - use este comando para desplegar esta ventana de nuevo\n~clients - use este comando para desplegar la lista de todos los clientes conectados al chat\n~info#[nombre del cliente]# - ingrese este comando al lado del nombre de un cliente activo para despegar su informacion. ejemplo: ~info#john#\n");
+	printf("A continuacion esta la lista de todos los comandos, para que funcionan y como usarlos\n~exit - use este comando para salir del chat o presione CTRL left + C \n~help - use este comando para desplegar esta ventana de nuevo\n~clients - use este comando para desplegar la lista de todos los clientes conectados al chat\n~dm - use este comnado para mandar un mensaje a un usuario en específico. Le pedirá información que puede encontrar en \"~clients\"\n");
 } 
 
 void *recv_msg_handler(void *){
@@ -51,8 +55,49 @@ void *recv_msg_handler(void *){
 	while(1){
 		int receive = recv(sockfd, message, BUFFER_SZ, 0);
 		if(receive > 0){
-			printf("%s ", message);
-			str_overwrite_stdout();
+			string mensaje(message);
+			ServerMessage sm;
+			sm.ParseFromString(mensaje);
+			if(sm.option()==1){
+				if (sm.broadcast().has_username()){
+					cout<<"[Broadcast] "<<sm.broadcast().username()<<": "<<sm.broadcast().message()<<endl;
+					str_overwrite_stdout();
+				}else{
+					cout<<sm.broadcast().userid()<<": "<<sm.broadcast().message()<<endl;
+					str_overwrite_stdout();
+				}
+			}else if(sm.option()==2){
+				if(sm.message().has_username()){
+					cout<<"[Private] "<<sm.message().username()<<": "<<sm.message().message();
+					str_overwrite_stdout();
+				}
+				else{
+					cout<<"[Private] "<<sm.message().userid()<<": "<<sm.message().message();
+					str_overwrite_stdout();
+				}
+			}else if(sm.option()==3){
+				cout<<"Error: "<<sm.error().errormessage()<<endl;
+			}else if(sm.option()==5){
+				int a=sm.connecteduserresponse().connectedusers_size();
+				int i;
+				for(i=0;i<a-1;i++){
+					ConnectedUser cu=sm.connecteduserresponse().connectedusers()[i];
+					cout<<"____________"<<endl;
+					str_overwrite_stdout();
+					cout<<"[Server] "<<"Username: "<<cu.username()<<endl;
+					str_overwrite_stdout();
+					if (cu.has_userid()){
+						cout<<"[Server] "<<"UserId: "<<cu.userid()<<endl;
+						str_overwrite_stdout();
+					}
+					cout<<"____________"<<endl;
+					str_overwrite_stdout();
+				}
+			}else if (sm.option()==8){
+				cout<<"[Server] "<<sm.directmessageresponse().messagestatus();
+				str_overwrite_stdout();
+			}
+			
 		}else if(receive == 0){
 			break;
 		}
@@ -73,42 +118,79 @@ void *send_msg_handler(void *){
 		{
 			break;
 		}else if(
-			strcmp(buffer, "~1")==0 || 
-			strcmp(buffer, "~2")==0 || 
-			strcmp(buffer, "~3")==0 || 
 			strcmp(buffer, "~help")==0 ||
 			strcmp(buffer, "~clients")==0||
 			strcmp(buffer, "~exit")==0||
+			strcmp(buffer, "~dm")==0||
 			(buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' )){
-			if (strcmp(buffer, "~1") == 0){
-    			printf("%s\n", "Status: ACTIVO");
-    			send(sockfd, buffer, strlen(buffer), 0);
-			}
-		    else if (strcmp(buffer, "~2") == 0){
-		    	printf("%s\n", "Status: OCUPADO");
-    			send(sockfd, buffer, strlen(buffer), 0);
-		        }
-		    else if (strcmp(buffer, "~3") == 0){
-		    	printf("%s\n", "Status: INACTIVO");
-    			send(sockfd, buffer, strlen(buffer), 0);
-		        }
-		    else if (strcmp(buffer, "~help") == 0){
+			
+		    if (strcmp(buffer, "~help") == 0){
 		    	help();
 		        }
 		    else if (strcmp(buffer, "~clients") == 0){
-				send(sockfd, buffer, strlen(buffer), 0);
+		    	ClientMessage cm;
+		    	cm.set_option(2);
+		    	connectedUserRequest *cur(new connectedUserRequest);
+		    	cm.set_allocated_connectedusers(cur);
+    			string binary;
+    			cm.SerializeToString(&binary);
+    			char bus[binary.size()+1];
+    			strcpy(bus,binary.c_str());
+    			send(sockfd, bus, strlen(bus),0);
 		    	}
 		    else if (buffer[0] == '~' && buffer[1] == 'i' && buffer[2] == 'n' && buffer[3] == 'f' && buffer[4] == 'o' ){
 				printf("En caso no aparezca informacion despues este mensaje, puede ser a que no escribio bien el comando o el nombre de la persona.\n");
-				send(sockfd, buffer, strlen(buffer), 0);
 		    	}
+		    else if(!strcmp(buffer,"~dm")){
+		    	ClientMessage cm;
+		    	DirectMessageRequest *dmr(new DirectMessageRequest);
+				bzero(buffer, BUFFER_SZ + NAME_LEN);
+		    	cout<<"Ingrese el nombre de usuario del destinatario (si no lo tiene ingrese \"-\")"<<endl;
+				str_overwrite_stdout();
+				fgets(buffer, BUFFER_SZ, stdin);
+				if(!(strcmp(buffer,"-")==0||strcmp(buffer,"")==0)){
+					string a(buffer);
+					dmr->set_username(a);
+				}
+				bzero(buffer, BUFFER_SZ + NAME_LEN);
+		    	cout<<"Ingrese el UserId del destinatario (si no lo tiene ingrese \"-\")"<<endl;
+				str_overwrite_stdout();
+				fgets(buffer, BUFFER_SZ, stdin);
+				if(strcmp(buffer,"-") && strcmp(buffer,"")){
+					string a(buffer);
+					int b=stoi(a);
+					dmr->set_userid(b);
+				}
+				cout<<"Ingrese el mensaje que desea enviar"<<endl;
+				str_overwrite_stdout();
+				fgets(buffer, BUFFER_SZ, stdin);
+				string a(buffer);
+				dmr->set_message(a);
+				cm.set_option(5);
+				cm.set_allocated_directmessage(dmr);
+				string o;
+				cm.SerializeToString(&o);
+				char bus[o.size()+1];
+				strcpy(bus,o.c_str());
+				send(sockfd, bus, strlen(bus),0);
+				
+		    }
 		    else {
 		        printf("No valido :(");
 		    }
 
 		}else{
-			sprintf(message, "%s: %s\n", name, buffer);
-			send(sockfd, message, strlen(message), 0);
+			ClientMessage cm;
+			cm.set_option(4);
+			string msg(buffer);
+			BroadcastRequest *br(new BroadcastRequest);
+			br->set_message(msg);
+			cm.set_allocated_broadcast(br);
+    		string binary;
+    		cm.SerializeToString(&binary);
+    		char bus[binary.size()+1];
+    		strcpy(bus,binary.c_str());
+    		send(sockfd, bus, strlen(bus),0);
 		}
 
 	bzero(message, BUFFER_SZ);
@@ -166,8 +248,57 @@ int main(int argc, char **argv){
     }
 
     //Enviar el nombre
-    send(sockfd, argv[1], NAME_LEN,0);
+    
+    
+    MyInfoSynchronize * miInfo(new MyInfoSynchronize);
+    miInfo->set_username(argv[1]);
+    miInfo->set_ip(argv[2]);
 
+    ClientMessage m;
+    m.set_option(1);
+    m.set_allocated_synchronize(miInfo);
+
+    string binary;
+    m.SerializeToString(&binary);
+    char bus[binary.size()+1];
+    strcpy(bus,binary.c_str());
+    send(sockfd, bus, strlen(bus),0);
+    
+    //recibe el acknowledge
+    char message[BUFFER_SZ];
+	int recieve = recv(sockfd, message, BUFFER_SZ, 0);
+	if (recieve){
+		string acknol(message);
+		ServerMessage sm;
+		sm.ParseFromString(acknol);
+		if (sm.option()==4){
+			
+			MyInfoAcknowledge * ack(new MyInfoAcknowledge);
+    		ack->set_userid(sm.myinforesponse().userid());
+    		ClientMessage m;
+    		m.set_option(6);
+    		m.set_allocated_acknowledge(ack);
+    		
+   		 	string bin;
+    		m.SerializeToString(&bin);
+    		char buss[bin.size()+1];
+    		strcpy(buss,bin.c_str());
+    		send(sockfd, buss, strlen(buss),0);
+
+ 
+		}else if(sm.option()==3){
+			cout<<sm.error().errormessage()<<endl;
+			return EXIT_FAILURE;
+		}
+		else{
+			cout<<"Error en respuesta del servidor 1"<<endl;
+			return EXIT_FAILURE;
+		}
+    }else{
+		cout<<"Error en respuesta del servidor 2"<<endl;
+		return EXIT_FAILURE;
+    }
+	
     printf("///WELCOME TO THE CHAT///\nPara saber todos los comando del chat ponga el comando ~help y presione ENTER\n");
 
     pthread_t send_msg_thread;
